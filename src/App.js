@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
 
-const Container = styled.div``
+import List from './components/List/List';
+
+
 
 class App extends Component {
   state = {  }
   render() { 
     return (
-      <Container>
-      </Container>
+      <List />
     );
   }
 }
