@@ -13,10 +13,14 @@ const Container = styled.div`
     width: 250px;
     height: calc(100% - 8px);
     padding-top: 8px;
-    background-color: #d5e8ff;
+    background-color: #eeeeee;
     border-right: 1px solid rgba(0,0,0,0.1);
     transition: 0.2s ease-in-out;
-    left: ${props => props.active ? '0px' : '-250px' };
+    margin-left: ${props => props.navToggle ? '0px' : '-250px'};
+    
+    @media (max-width: 900px) {
+        box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
+    }
 `
 
 const User = styled.div`
@@ -33,9 +37,10 @@ const User = styled.div`
 
 class Nav extends Component {
     state = {  }
+
     render() { 
         return (
-            <Container active={this.props.active}>
+            <Container ref={this.props.navRef} navToggle={this.props.navToggle}>
                 <User>Username</User>
                 <NavItem label='Today' icon={iconToday} counter='5'/>
                 <NavItem label='Tomorrow' icon={iconToday} counter='2'/>
