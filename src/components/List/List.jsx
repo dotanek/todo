@@ -14,23 +14,33 @@ const Container = styled.div`
 `
 
 const Button = styled.div`
-    position: fixed;
+    position: absolute;
     left: 10px;
     bottom: 10px;
     width: 50px;
     height: 50px;
     border-radius: 25px;
     background-color: #105510;
+    z-index: 1001;
     
     &:hover {
         cursor: pointer;
     }
 `
 
+const navTabs = {
+    today: { label: 'Today', id:'today'},
+    tomorrow: { label: 'Tomorrow', id:'tomorrow' },
+    thisWeek: { label: 'This week', id: 'this-week' },
+    nextWeek: { label: 'Next week', id: 'next-week' }
+}
+
 class List extends Component {
     state = {
         navToggle: (window.innerWidth >= 900),
-        detailsToggle: (window.innerWidth >= 700)
+        detailsToggle: (window.innerWidth >= 700),
+        taskGroups: [],
+        activeTab: navTabs.today
     }
 
     constructor(props) {
@@ -38,6 +48,8 @@ class List extends Component {
         this.navRef = React.createRef();
         this.buttonRef = React.createRef(); // This is temporary, will be deleted.
     }
+
+    // -- Events --
 
     onResizeWindow = () => {
         let navToggle;
@@ -81,13 +93,35 @@ class List extends Component {
     componentDidMount = () => {
         window.addEventListener('resize', this.onResizeWindow);
         window.addEventListener('click', this.onClickWindow);
+
+        // Grouping tasks by date.
+
+        let taskGroups = []; 
+
+        const tasks = [
+            { id:'task1', description:'Wyrzucić śmieci.', date:'today' },
+            { id:'task2', description:'Zrobić pranie.', date:'today' },
+            { id:'task3', description:'Pamiętaj aby strzelić bujakę po mieście i dostać limo.', date:'tomorrow' },
+        ];
+
+        tasks.forEach(t => {
+            let target = taskGroups.find(g => g.date === t.date);
+
+            if (typeof target === 'undefined') {
+                taskGroups.push({ tasks:[t], date:t.date });
+            } else {
+                target.tasks.push(t);
+            }
+        });
+
+        this.setState({ taskGroups });
     }
 
     render() { 
         return (
             <Container>
-                <Nav navRef={this.navRef} navToggle={this.state.navToggle}/>
-                <Contents navToggle={this.state.navToggle}/>
+                <Nav activeTab={this.state.activeTab} navRef={this.navRef} navToggle={this.state.navToggle} taskGroups={this.state.taskGroups}/>
+                <Contents navToggle={this.state.navToggle} taskGroups={this.state.taskGroups}/>
                 <Details detailsToggle={this.state.detailsToggle}/>
                 <Button ref={this.buttonRef} onClick={this.onClickButton}/>
             </Container>

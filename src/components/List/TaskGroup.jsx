@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+import Task from './Task';
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
     padding-bottom: 5px;
-    /*border-bottom: 1px solid black;*/
 `
 
 const Label = styled.div`
@@ -17,18 +18,21 @@ const Label = styled.div`
     padding-left: 5px;
     font-size: 16px;
     color: #606060;
-    /*background-color: rgba(0,0,0,0.1);*/
+
+    &:hover {
+        cursor: pointer;
+    }
 `
 
 const Toggle = styled.div`
     position: relative;
     display: flex;
-    width: 30px;
+    width: 25px;
     height: 100%;
     justify-content: center;
     align-items: center;
-    /*align-items:background-color: rgba(0,0,0,0.1);*/
-    transform: rotate(-90deg);
+    transform: ${props => props.groupToggle ? 'translateY(-2px) rotate(0deg)' : 'rotate(-90deg)'};
+    transition: 0.2s ease-in-out;
 
     div {
         position: absolute;
@@ -40,12 +44,12 @@ const Toggle = styled.div`
 
 const Rect1 = styled.div`
     transform-origin: right bottom;
-    transform: translate(-3px,3px) rotate(45deg);
+    transform: translate(-3px,4px) rotate(45deg);
 `
 
 const Rect2 = styled.div`
     transform-origin: left bottom;
-    transform: translate(3px,3px) rotate(-45deg);
+    transform: translate(3px,4px) rotate(-45deg);
 `
 
 const Text = styled.div`
@@ -62,19 +66,69 @@ const Line = styled.div`
     border-bottom: 1px solid #999999;
 `
 
+const Amount = styled.div`
+    display: flex;
+    width: 20px;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+    font-size: 15px;
+`
+
+const Tasks = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 60px);
+    padding-left: 30px;
+    padding-right: 30px;
+`
+
+const Placeholder = styled.div`
+    display: flex;
+    width: 100%;
+    align-items: center;
+    font-size: 15px;
+    color: #606060;
+`
+
 class TaskGroup extends Component {
-    state = {  }
+    state = {  
+        groupToggle: false,
+    }
+
+     // -- Events -- 
+
+    onClickLabel = () => {
+        this.setState({ groupToggle:!this.state.groupToggle });
+    }
+
+    // -- Renders -- 
+
+    renderTasks = () => {
+        if (this.props.tasks && this.props.tasks.length > 0) {
+            return this.props.tasks.map(t => {
+                return <Task key={t.id} task={t} />
+            });
+        } else {
+            return <Placeholder>There are no tasks for this day.</Placeholder>
+        }
+    }
+
     render() {
         return ( 
             <Container>
-                <Label>
-                    <Toggle>
+                <Label onClick={this.onClickLabel}>
+                    <Toggle groupToggle={this.state.groupToggle}>
                         <Rect1 />
                         <Rect2 />
                     </Toggle>
-                    <Text>{this.props.name}</Text>
+                    <Text>{this.props.group.date}</Text>
                     <Line />
+                    <Amount>{this.props.tasks.length}</Amount>
                 </Label>
+                <Tasks>
+                    {this.state.groupToggle && this.renderTasks()}
+                </Tasks>
             </Container>
         );
     }

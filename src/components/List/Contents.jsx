@@ -27,7 +27,7 @@ const Title = styled.div`
     font-weight: bold;
 `
 
-const Tasks = styled.div`
+const TaskGroups = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -36,18 +36,43 @@ const Tasks = styled.div`
     overflow: auto;
 `
 
-
 class Contents extends Component {
-    state = {  }
+    state = {
+        taskView:'this-week',
+    }
+
+    // -- Renders --
+
+    renderTaskGroups = () => {
+        const taskGroups = this.props.taskGroups;
+
+        switch(this.state.taskView) {
+            case 'today': 
+                return <TaskGroup group={taskGroups[0]} tasks={taskGroups[0].tasks}></TaskGroup>
+            
+            case 'tomorrow':
+                return <TaskGroup group={taskGroups[1]} tasks={taskGroups[1].tasks}></TaskGroup>
+
+            case 'this-week':
+                return taskGroups.map(g => {
+                    return <TaskGroup key={g.date} group={g} tasks={g.tasks} />
+                });
+
+            default:break;
+        }
+    }
+
     render() {
         return (
             <Container navToggle={this.props.navToggle}>
-                <Title>Today</Title>
-                <Tasks>
-                    <TaskGroup name='Today'></TaskGroup>
-                    <TaskGroup name='Tomorrow'></TaskGroup>
-                    <TaskGroup name='Saturday'></TaskGroup>
-                </Tasks>
+                <Title>This week</Title>
+                <TaskGroups>
+                    {this.renderTaskGroups()}
+                    {/*<TaskGroup name='Today' />
+                    <TaskGroup name='Tomorrow' />
+                    <TaskGroup name='Saturday' />
+                    <TaskGroup name='Completed' />*/}
+                </TaskGroups>
             </Container>
         );
     }

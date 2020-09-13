@@ -7,7 +7,6 @@ const Container = styled.div`
     height: 40px;
     margin-top: 2px;
     border-radius: 5px;
-    /*border: 1px solid black;*/
     &:hover {
         background-color: rgba(0,0,0,0.1);
         cursor: pointer;
