@@ -28,19 +28,90 @@ const Button = styled.div`
     }
 `
 
-const navTabs = {
-    today: { label: 'Today', id:'today'},
-    tomorrow: { label: 'Tomorrow', id:'tomorrow' },
-    thisWeek: { label: 'This week', id: 'this-week' },
-    nextWeek: { label: 'Next week', id: 'next-week' }
-}
+let date = new Date();
+
+const taskTabs = [ 
+    { 
+        label: 'Today', 
+        id:'today',
+        groupFilter: (taskGroup) => {
+            if (
+                taskGroup.date.getYear() === date.getYear() &&
+                taskGroup.date.getMonth() === date.getMonth() &&
+                taskGroup.date.getDay() === date.getDay()
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    },
+    { 
+        label: 'Tomorrow',
+        id:'tomorrow',
+        groupFilter: (taskGroup) => {
+            if (
+                taskGroup.date.getYear() === date.getYear() &&
+                taskGroup.date.getMonth() === date.getMonth() &&
+                taskGroup.date.getDay() === date.getDay() + 1
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    },
+    { 
+        label: 'This week',
+        id: 'this-week',
+        groupFilter: (taskGroup) => {
+            let weekStart = new Date();
+            let weekEnd = new Date();
+            weekStart.setDate(date.getDate() - date.getDay());
+            weekStart.setHours(24,0,0);
+            weekEnd.setDate(date.getDate() + (7 - date.getDay()));
+            weekEnd.setHours(23,59,59);
+
+            if (
+                taskGroup.date >= weekStart &&
+                taskGroup.date <= weekEnd
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        } 
+    },
+    {
+        label: 'Next week',
+        id: 'next-week',
+        groupFilter: (taskGroup) => {
+            let weekStart = new Date();
+            let weekEnd = new Date();
+            weekStart.setDate((date.getDate() - date.getDay()) + 7);
+            weekStart.setHours(24,0,0);
+            weekEnd.setDate((date.getDate() + (7 - date.getDay())) + 7);
+            weekEnd.setHours(23,59,59);
+
+            if (
+                taskGroup.date >= weekStart &&
+                taskGroup.date <= weekEnd
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+];
+
 
 class List extends Component {
     state = {
         navToggle: (window.innerWidth >= 900),
         detailsToggle: (window.innerWidth >= 700),
         taskGroups: [],
-        activeTab: navTabs.today
+        activeTab: taskTabs[0]
     }
 
     constructor(props) {
@@ -90,18 +161,31 @@ class List extends Component {
         }
     }
 
+    onClickTaskTab = (taskTab) => {
+        this.setState({ activeTab:taskTab });
+    }
+
     componentDidMount = () => {
         window.addEventListener('resize', this.onResizeWindow);
         window.addEventListener('click', this.onClickWindow);
 
         // Grouping tasks by date.
 
-        let taskGroups = []; 
+        let taskGroups = [];
+
+        let date2 = new Date();
+        date2.setDate(date.getDate() + 1);
+        let date3 = new Date();
+        date3.setDate(date.getDate() + 2);
+        let date4 = new Date();
+        date4.setDate(23);
 
         const tasks = [
-            { id:'task1', description:'Wyrzucić śmieci.', date:'today' },
-            { id:'task2', description:'Zrobić pranie.', date:'today' },
-            { id:'task3', description:'Pamiętaj aby strzelić bujakę po mieście i dostać limo.', date:'tomorrow' },
+            { id:'task1', title:'Wyrzucić śmieci.', date: date },
+            { id:'task2', title:'Zrobić pranie.', date: date },
+            { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limo.', date: date2 },
+            { id:'task3', title:'Pamiętaj o kablu do akumulatora.', date: date3 },
+            { id:'task3', title:'Pobić żonę', date: date4 },
         ];
 
         tasks.forEach(t => {
@@ -117,12 +201,29 @@ class List extends Component {
         this.setState({ taskGroups });
     }
 
+    onClickTask = (task) => {
+        this.setState({ activeTask:task })
+    }
+
     render() { 
         return (
             <Container>
-                <Nav activeTab={this.state.activeTab} navRef={this.navRef} navToggle={this.state.navToggle} taskGroups={this.state.taskGroups}/>
-                <Contents navToggle={this.state.navToggle} taskGroups={this.state.taskGroups}/>
-                <Details detailsToggle={this.state.detailsToggle}/>
+                <Nav
+                    activeTab={this.state.activeTab}
+                    taskTabs={taskTabs}
+                    navRef={this.navRef}
+                    navToggle={this.state.navToggle}
+                    taskGroups={this.state.taskGroups}
+                    onClickTaskTab={(taskTab) => this.onClickTaskTab(taskTab)}
+                />
+                <Contents
+                    navToggle={this.state.navToggle}
+                    activeTab={this.state.activeTab}
+                    taskGroups={this.state.taskGroups}
+                    activeTask={this.state.activeTask}
+                    onClickTask={(t) => this.onClickTask(t)}
+                />
+                <Details detailsToggle={this.state.detailsToggle} activeTask={this.state.activeTask}/>
                 <Button ref={this.buttonRef} onClick={this.onClickButton}/>
             </Container>
         );

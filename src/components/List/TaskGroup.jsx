@@ -93,7 +93,7 @@ const Placeholder = styled.div`
 
 class TaskGroup extends Component {
     state = {  
-        groupToggle: false,
+        groupToggle: true,
     }
 
      // -- Events -- 
@@ -105,13 +105,63 @@ class TaskGroup extends Component {
     // -- Renders -- 
 
     renderTasks = () => {
-        if (this.props.tasks && this.props.tasks.length > 0) {
-            return this.props.tasks.map(t => {
-                return <Task key={t.id} task={t} />
+        const tasks = this.props.taskGroup.tasks;
+        if (tasks && tasks.length > 0) {
+            return tasks.map(t => {
+                return (
+                    <Task
+                        key={t.id}
+                        task={t}
+                        taskActive={this.props.activeTask === t}
+                        onClickTask={() => this.props.onClickTask(t)}
+                    />
+                );
             });
         } else {
             return <Placeholder>There are no tasks for this day.</Placeholder>
         }
+    }
+
+    // -- Other --
+
+    formatLabel = () => {
+        let today = new Date();
+        let date = this.props.taskGroup.date;
+
+        if (
+            date.getYear() === today.getYear() &&
+            date.getMonth() === today.getMonth() &&
+            date.getDate() === today.getDate()
+        ) {
+            return 'Today';
+        }
+
+        if (
+            date.getYear() === today.getYear() &&
+            date.getMonth() === today.getMonth() &&
+            date.getDate() === today.getDate() + 1
+        ) {
+            return 'Tomorrow';
+        }
+
+        const months = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday'
+        ];
+
+        let day = months[(date.getDay() + 6) % 7];
+
+        let d = date.getDate();
+        let m = date.getMonth() + 1;
+        console.log(m);
+        let y = date.getFullYear();
+
+        return `${day} ${d > 9 ? d : '0' + d}.${m > 9 ? m : '0' + m}.${y}`
     }
 
     render() {
@@ -122,9 +172,9 @@ class TaskGroup extends Component {
                         <Rect1 />
                         <Rect2 />
                     </Toggle>
-                    <Text>{this.props.group.date}</Text>
+                    <Text>{this.formatLabel()}</Text>
                     <Line />
-                    <Amount>{this.props.tasks.length}</Amount>
+                    <Amount>{this.props.taskGroup.tasks.length}</Amount>
                 </Label>
                 <Tasks>
                     {this.state.groupToggle && this.renderTasks()}

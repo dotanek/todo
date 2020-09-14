@@ -37,41 +37,24 @@ const TaskGroups = styled.div`
 `
 
 class Contents extends Component {
-    state = {
-        taskView:'this-week',
-    }
+    state = { }
 
     // -- Renders --
 
     renderTaskGroups = () => {
-        const taskGroups = this.props.taskGroups;
-
-        switch(this.state.taskView) {
-            case 'today': 
-                return <TaskGroup group={taskGroups[0]} tasks={taskGroups[0].tasks}></TaskGroup>
-            
-            case 'tomorrow':
-                return <TaskGroup group={taskGroups[1]} tasks={taskGroups[1].tasks}></TaskGroup>
-
-            case 'this-week':
-                return taskGroups.map(g => {
-                    return <TaskGroup key={g.date} group={g} tasks={g.tasks} />
-                });
-
-            default:break;
-        }
+        return this.props.taskGroups
+            .filter(tg => this.props.activeTab.groupFilter(tg))
+            .map(tg => {
+                return <TaskGroup key={tg.date} taskGroup={tg} activeTask={this.props.activeTask} onClickTask={(t) => this.props.onClickTask(t)}/>
+            });
     }
 
     render() {
         return (
             <Container navToggle={this.props.navToggle}>
-                <Title>This week</Title>
+                <Title>{this.props.activeTab.label}</Title>
                 <TaskGroups>
                     {this.renderTaskGroups()}
-                    {/*<TaskGroup name='Today' />
-                    <TaskGroup name='Tomorrow' />
-                    <TaskGroup name='Saturday' />
-                    <TaskGroup name='Completed' />*/}
                 </TaskGroups>
             </Container>
         );

@@ -39,26 +39,49 @@ const User = styled.div`
 class Nav extends Component {
     state = { }
 
+    // -- Renders --
+
+    renderTaskTabs = () => {
+        return this.props.taskTabs.map(t => {
+            let taskGroups = this.props.taskGroups.filter(tg => t.groupFilter(tg));
+            let counter = 0;
+
+            if (taskGroups.length) {
+                taskGroups.forEach(tg => counter += tg.tasks.length);
+            }
+
+            return (
+                <NavItem
+                    key={t.id}
+                    label={t.label}
+                    icon={iconToday}
+                    counter={counter}
+                    tabActive={t === this.props.activeTab}
+                    onClickTaskTab={() => this.props.onClickTaskTab(t)}
+                />
+            );
+        });
+    }
+
+    // -- Others -- //
+
     generateCounters = () => {
-        let counters = {};
+        let counters = [];
 
-        let today = this.props.taskGroups.find(g => g.date === 'today');
-        counters.today = (typeof today !== 'undefined') ? today.tasks.length : 0;
-
-        let tomorrow = this.props.taskGroups.find(g => g.date === 'tomorrow');
-        counters.tomorrow = (typeof tomorrow !== 'undefined') ? tomorrow.tasks.length : 0;
+        console.log(this.props.taskGroups);
+        this.props.taskTabs.forEach(t => {
+            let taskGroups = this.props.taskGroups.filter(tg => t.filter(tg));
+            counters.push(taskGroups.length);
+        });
 
         return counters;
     }
 
-    render() { // Each tab should be an object and have its own group picking function.
+    render() {
         return (
             <Container ref={this.props.navRef} navToggle={this.props.navToggle}>
                 <User>Username</User>
-                <NavItem label='Today' icon={iconToday} counter={this.generateCounters().today} />
-                <NavItem label='Tomorrow' icon={iconToday} counter={this.generateCounters().tomorrow} />
-                <NavItem label='This week' icon={iconToday} counter='3'/>
-                <NavItem label='Next week' icon={iconToday} counter='50'/>
+                {this.renderTaskTabs()}
             </Container>
         );
     }

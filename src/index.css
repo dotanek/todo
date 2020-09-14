@@ -19,3 +19,10 @@ body {
   color: #202020;
   font-family: 'Mukta', sans-serif;
 }
+
+input, textarea {
+  font-family: 'Mukta', sans-serif;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}

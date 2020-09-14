@@ -7,6 +7,9 @@ const Container = styled.div`
     height: 40px;
     margin-top: 2px;
     border-radius: 5px;
+
+    background-color: ${props => props.tabActive ? 'rgba(0,0,255,0.1)' : 'none'};
+
     &:hover {
         background-color: rgba(0,0,0,0.1);
         cursor: pointer;
@@ -49,7 +52,7 @@ class NavItem extends Component {
     state = {  }
     render() { 
         return (
-            <Container>
+            <Container tabActive={this.props.tabActive} onClick={this.props.onClickTaskTab}>
                 <Icon><img src={this.props.icon} alt='welp'/></Icon>
                 <Label>{this.props.label}</Label>
                 <Counter>{this.props.counter}</Counter>

@@ -12,6 +12,8 @@ const Container = styled.div`
     margin-top: 4px;
     color: #303030;
 
+    background-color: ${props => props.taskActive ? 'rgba(0,0,255,0.1)' : 'none'};
+
     &:hover {
         background-color: rgba(0,0,0,0.1);
         cursor: pointer;
@@ -46,9 +48,9 @@ class Task extends Component {
 
     render() { 
         return (
-            <Container>
+            <Container onClick={this.props.onClickTask} taskActive={this.props.taskActive}>
                 <Checkbox type='checkbox' />
-                {this.props.task.description}
+                {this.props.task.title}
             </Container>
         );
     }
