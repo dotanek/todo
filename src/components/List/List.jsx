@@ -7,10 +7,11 @@ import Details from './Details';
 
 const Container = styled.div`
     display: flex;
-    width: 100%;
-    height: calc(100vh - 2px);
+    width: 100vw;
+    height: ${window.innerHeight + 'px'};
     margin: 0;
     padding: 0;
+    overflow: hidden;
 `
 
 const Button = styled.div`
@@ -22,9 +23,11 @@ const Button = styled.div`
     border-radius: 25px;
     background-color: #105510;
     z-index: 1001;
-    
-    &:hover {
-        cursor: pointer;
+
+    @media screen {
+        &:hover {
+            cursor: pointer;
+        }
     }
 `
 
@@ -38,7 +41,7 @@ const taskTabs = [
             if (
                 taskGroup.date.getYear() === date.getYear() &&
                 taskGroup.date.getMonth() === date.getMonth() &&
-                taskGroup.date.getDay() === date.getDay()
+                taskGroup.date.getDate() === date.getDate()
             ) {
                 return true;
             } else {
@@ -53,7 +56,7 @@ const taskTabs = [
             if (
                 taskGroup.date.getYear() === date.getYear() &&
                 taskGroup.date.getMonth() === date.getMonth() &&
-                taskGroup.date.getDay() === date.getDay() + 1
+                taskGroup.date.getDate() === date.getDate() + 1
             ) {
                 return true;
             } else {
@@ -117,6 +120,7 @@ class List extends Component {
     constructor(props) {
         super(props);
         this.navRef = React.createRef();
+        this.detailsRef = React.createRef();
         this.buttonRef = React.createRef(); // This is temporary, will be deleted.
     }
 
@@ -151,6 +155,13 @@ class List extends Component {
         ) {
             this.setState({ navToggle:false }); // Hides navigation when clicking outside of it in mobile mode.
         }
+
+        if(
+            !this.detailsRef.current.contains(e.target) &&
+            window.innerWidth < 700
+        ) {
+            this.setState({ detailsToggle:false }); // Hides details when clicking outside of it in mobile mode.
+        }
     }
 
     onClickButton = () => { // Auto toggle and user toggle is spearated.
@@ -162,7 +173,17 @@ class List extends Component {
     }
 
     onClickTaskTab = (taskTab) => {
-        this.setState({ activeTab:taskTab });
+        this.setState({ activeTab:taskTab, navToggle:(window.innerWidth >= 900) });
+    }
+
+    onClickTask = (task) => {
+        setTimeout(() => {
+            this.setState({ activeTask:task, detailsToggle:true });
+        },1)
+    }
+    
+    onClickDetailsReturn = () => {
+        this.setState({ detailsToggle:false });
     }
 
     componentDidMount = () => {
@@ -183,7 +204,7 @@ class List extends Component {
         const tasks = [
             { id:'task1', title:'Wyrzucić śmieci.', date: date },
             { id:'task2', title:'Zrobić pranie.', date: date },
-            { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limo.', date: date2 },
+            { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limoooooooooooooooooooo.', date: date2 },
             { id:'task3', title:'Pamiętaj o kablu do akumulatora.', date: date3 },
             { id:'task3', title:'Pobić żonę', date: date4 },
         ];
@@ -201,10 +222,6 @@ class List extends Component {
         this.setState({ taskGroups });
     }
 
-    onClickTask = (task) => {
-        this.setState({ activeTask:task })
-    }
-
     render() { 
         return (
             <Container>
@@ -218,12 +235,18 @@ class List extends Component {
                 />
                 <Contents
                     navToggle={this.state.navToggle}
+                    detailsToggle={this.state.detailsToggle}
                     activeTab={this.state.activeTab}
                     taskGroups={this.state.taskGroups}
                     activeTask={this.state.activeTask}
                     onClickTask={(t) => this.onClickTask(t)}
                 />
-                <Details detailsToggle={this.state.detailsToggle} activeTask={this.state.activeTask}/>
+                <Details
+                    detailsToggle={this.state.detailsToggle}
+                    activeTask={this.state.activeTask}
+                    detailsRef={this.detailsRef}
+                    onClickDetailsReturn={this.onClickDetailsReturn}
+                />
                 <Button ref={this.buttonRef} onClick={this.onClickButton}/>
             </Container>
         );

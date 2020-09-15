@@ -9,11 +9,16 @@ const Container = styled.div`
     flex-grow: 1;
     height: 100%;
     margin-left: ${props => props.navToggle ? '250px' : '0px'};
-    border-right: 1px solid rgba(0,0,0,0.1);
+    margin-right: ${props => props.detailsToggle ? '35%' : '0%'};
+    overflow: hidden;
     transition: 0.2s ease-in-out;
 
     @media (max-width: 900px) {
         margin-left: 0px;
+    }
+
+    @media (max-width: 500px) {
+        margin-right: 0%;
     }
 `
 const Title = styled.div`
@@ -51,7 +56,7 @@ class Contents extends Component {
 
     render() {
         return (
-            <Container navToggle={this.props.navToggle}>
+            <Container navToggle={this.props.navToggle} detailsToggle={this.props.detailsToggle}>
                 <Title>{this.props.activeTab.label}</Title>
                 <TaskGroups>
                     {this.renderTaskGroups()}
