@@ -125,6 +125,10 @@ class TaskGroup extends Component {
     // -- Other --
 
     formatLabel = () => {
+        if (this.props.taskGroup.completed) {
+            return 'Completed';
+        }
+
         let today = new Date();
         let date = this.props.taskGroup.date;
 

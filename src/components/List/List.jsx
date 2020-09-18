@@ -38,6 +38,11 @@ const taskTabs = [
         label: 'Today', 
         id:'today',
         groupFilter: (taskGroup) => {
+
+            if (taskGroup.completed) {
+                return false;
+            }
+
             if (
                 taskGroup.date.getYear() === date.getYear() &&
                 taskGroup.date.getMonth() === date.getMonth() &&
@@ -53,6 +58,11 @@ const taskTabs = [
         label: 'Tomorrow',
         id:'tomorrow',
         groupFilter: (taskGroup) => {
+
+            if (taskGroup.completed) {
+                return false;
+            }
+
             if (
                 taskGroup.date.getYear() === date.getYear() &&
                 taskGroup.date.getMonth() === date.getMonth() &&
@@ -68,6 +78,11 @@ const taskTabs = [
         label: 'This week',
         id: 'this-week',
         groupFilter: (taskGroup) => {
+
+            if (taskGroup.completed) {
+                return false;
+            }
+
             let weekStart = new Date();
             let weekEnd = new Date();
             weekStart.setDate(date.getDate() - date.getDay());
@@ -89,6 +104,11 @@ const taskTabs = [
         label: 'Next week',
         id: 'next-week',
         groupFilter: (taskGroup) => {
+
+            if (taskGroup.completed) {
+                return false;
+            }
+
             let weekStart = new Date();
             let weekEnd = new Date();
             weekStart.setDate((date.getDate() - date.getDay()) + 7);
@@ -113,6 +133,7 @@ class List extends Component {
     state = {
         navToggle: (window.innerWidth >= 900),
         detailsToggle: (window.innerWidth >= 700),
+        mobileView: (window.innerWidth < 700),
         taskGroups: [],
         activeTab: taskTabs[0]
     }
@@ -122,11 +143,23 @@ class List extends Component {
         this.navRef = React.createRef();
         this.detailsRef = React.createRef();
         this.buttonRef = React.createRef(); // This is temporary, will be deleted.
+        this.containerRef = React.createRef();
+
+        this.windowWidth = window.innerWidth;
     }
 
     // -- Events --
 
     onResizeWindow = () => {
+
+        this.containerRef.current.style.height = window.innerHeight + 'px'; // Keep 100% height on window resize.
+
+        if (this.windowWidth === window.innerWidth ) { // Prevent nav and details from hiding on height change. (Necessary for mobile when keyboard changes site height)
+            return;
+        }
+
+        this.windowWidth = window.innerWidth;
+
         let navToggle;
         let detailsToggle;
 
@@ -183,33 +216,51 @@ class List extends Component {
     }
     
     onClickDetailsReturn = () => {
-        this.setState({ detailsToggle:false });
+        this.setState({ detailsToggle:false, activeTask:undefined });
     }
 
-    componentDidMount = () => {
-        window.addEventListener('resize', this.onResizeWindow);
-        window.addEventListener('click', this.onClickWindow);
+    onChangeTaskTitle = (e) => {
+        if (!this.state.activeTask) {
+            return this.setState({ error: 'No active task while attempting to change title.'});
+        }
 
-        // Grouping tasks by date.
+        const tasks = [...this.state.tasks];
+        const target = tasks.find(t => t.id === this.state.activeTask.id);
+        
+        if (typeof target === 'undefined') {
+            return this.setState({ error: 'The task does not exist.'});
+        }
 
-        let taskGroups = [];
+        target.title = e.target.value;
+        this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });
+    }
 
-        let date2 = new Date();
-        date2.setDate(date.getDate() + 1);
-        let date3 = new Date();
-        date3.setDate(date.getDate() + 2);
-        let date4 = new Date();
-        date4.setDate(23);
+    onChangeTaskDescription = (e) => {
+        if (!this.state.activeTask) {
+            return this.setState({ error: 'No active task while attempting to change title.'});
+        }
 
-        const tasks = [
-            { id:'task1', title:'Wyrzucić śmieci.', date: date },
-            { id:'task2', title:'Zrobić pranie.', date: date },
-            { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limoooooooooooooooooooo.', date: date2 },
-            { id:'task3', title:'Pamiętaj o kablu do akumulatora.', date: date3 },
-            { id:'task3', title:'Pobić żonę', date: date4 },
+        const tasks = [...this.state.tasks];
+        const target = tasks.find(t => t.id === this.state.activeTask.id);
+        
+        if (typeof target === 'undefined') {
+            return this.setState({ error: 'The task does not exist.'});
+        }
+
+        target.description = e.target.value;
+        this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });
+    }
+
+    groupTasks = (tasks) => {
+        let taskGroups = [
+            { tasks: [], completed: true } // Completed tasks group.
         ];
 
         tasks.forEach(t => {
+            if (t.completed) {
+                return taskGroups[0].tasks.push(t);
+            }
+
             let target = taskGroups.find(g => g.date === t.date);
 
             if (typeof target === 'undefined') {
@@ -219,12 +270,36 @@ class List extends Component {
             }
         });
 
-        this.setState({ taskGroups });
+        return taskGroups;
+    }
+
+    componentDidMount = () => {
+        window.addEventListener('resize', this.onResizeWindow);
+        window.addEventListener('click', this.onClickWindow);        
+
+        // Grouping tasks by date.
+
+        let date2 = new Date();
+        date2.setDate(date.getDate() + 1);
+        let date3 = new Date();
+        date3.setDate(date.getDate() + 2);
+        let date4 = new Date();
+        date4.setDate(23);
+
+        const tasks = [
+            { id:'task1', title:'Wyrzucić śmieci.', description:'Elo.', date: date },
+            { id:'task2', title:'Zrobić pranie.', description: '', date: date },
+            { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limoooooooooooooooooooo.', date: date2 },
+            { id:'task3', title:'Pamiętaj o kablu do akumulatora.', date: date3, completed:true },
+            { id:'task3', title:'Pobić żonę', date: date4 },
+        ];
+
+        this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });
     }
 
     render() { 
         return (
-            <Container>
+            <Container ref={this.containerRef}>
                 <Nav
                     activeTab={this.state.activeTab}
                     taskTabs={taskTabs}
@@ -246,6 +321,8 @@ class List extends Component {
                     activeTask={this.state.activeTask}
                     detailsRef={this.detailsRef}
                     onClickDetailsReturn={this.onClickDetailsReturn}
+                    onChangeTaskTitle={this.onChangeTaskTitle}
+                    onChangeTaskDescription={this.onChangeTaskDescription}
                 />
                 <Button ref={this.buttonRef} onClick={this.onClickButton}/>
             </Container>

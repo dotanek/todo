@@ -79,8 +79,8 @@ const Date = styled.div`
 
 const Title = styled.input`
     display: flex;
-    width: calc(100% - 20px);
-    padding-left: 20px;
+    width: calc(100% - 40px);
+    padding: 0px 20px;
     height: 60px;
     font-size: 18px;
     align-items: center;
@@ -89,9 +89,12 @@ const Title = styled.input`
 `
 
 const Description = styled.textarea`
+    display: flex;
     width: calc(100% - 40px);
     padding: 20px;
     font-size: 14px;
+    resize: none;
+    flex-grow: 1;
 `
 
 class Details extends Component {
@@ -121,8 +124,8 @@ class Details extends Component {
                     {this.renderReturn()}
                     <Date>25th September</Date>
                 </Header>
-                <Title type='text' value={this.props.activeTask.title} onChange={() => console.log('ye')}/>
-                <Description placeholder='Click here and type to add a description.' />
+                <Title type='text' value={this.props.activeTask.title} onChange={this.props.onChangeTaskTitle}/>
+                <Description value={this.props.activeTask.description} placeholder='Click here and type to add a description.' onChange={this.props.onChangeTaskDescription}/>
             </Container>
         );
     }

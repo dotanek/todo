@@ -8,9 +8,10 @@ const Container = styled.div`
     flex-direction: column;
     flex-grow: 1;
     height: 100%;
+    max-height: 100%;
     margin-left: ${props => props.navToggle ? '250px' : '0px'};
     margin-right: ${props => props.detailsToggle ? '35%' : '0%'};
-    overflow: hidden;
+    overflow: auto;
     transition: 0.2s ease-in-out;
 
     @media (max-width: 900px) {
@@ -54,12 +55,19 @@ class Contents extends Component {
             });
     }
 
+    renderCompletedTaskGroup = () => {
+        if (this.props.taskGroups && this.props.taskGroups.length > 0) {
+            return <TaskGroup taskGroup={this.props.taskGroups[0]} activeTask={this.props.activeTask} onClickTask={(t) => this.props.onClickTask(t)}/>
+        }
+    }
+
     render() {
         return (
             <Container navToggle={this.props.navToggle} detailsToggle={this.props.detailsToggle}>
                 <Title>{this.props.activeTab.label}</Title>
                 <TaskGroups>
                     {this.renderTaskGroups()}
+                    {this.renderCompletedTaskGroup()}
                 </TaskGroups>
             </Container>
         );
