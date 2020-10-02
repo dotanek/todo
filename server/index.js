@@ -13,6 +13,7 @@ const PORT = process.env.PORT;
 // Import routes
 
 const authRoute = require('./routes/auth');
+const testRoute = require('./routes/test');
 
 // Middleware
 
@@ -21,10 +22,8 @@ app.use(express.json());
 // Route middlewares
 
 app.use('/api/user', authRoute);
+app.use('/test', testRoute);
 
-app.post('/test', (req,res) => {
-    console.log(req.body);
-});
 
 // Database
 
