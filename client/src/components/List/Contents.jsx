@@ -61,12 +61,19 @@ class Contents extends Component {
         }
     }
 
+    renderNoDateTaskGroup = () => {
+        if (this.props.taskGroups && this.props.taskGroups.length > 0) {
+            return <TaskGroup taskGroup={this.props.taskGroups[1]} activeTask={this.props.activeTask} onClickTask={(t) => this.props.onClickTask(t)}/>
+        }
+    }
+
     render() {
         return (
             <Container navToggle={this.props.navToggle} detailsToggle={this.props.detailsToggle}>
                 <Title>{this.props.activeTab.label}</Title>
                 <TaskGroups>
                     {this.renderTaskGroups()}
+                    {this.renderNoDateTaskGroup()}
                     {this.renderCompletedTaskGroup()}
                 </TaskGroups>
             </Container>

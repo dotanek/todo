@@ -129,6 +129,10 @@ class TaskGroup extends Component {
             return 'Completed';
         }
 
+        if (!this.props.taskGroup.date) {
+            return 'No date';
+        }
+
         let today = new Date();
         let date = this.props.taskGroup.date;
 

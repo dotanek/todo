@@ -1,9 +1,12 @@
 const router = require('express').Router();
-const User = require('../model/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const validation = require('./validation');
+
+// Model imports
+
+const User = require('../model/user');
 
 router.post('/register', async (req,res) => {
 

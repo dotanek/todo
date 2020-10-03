@@ -43,6 +43,10 @@ const taskTabs = [
                 return false;
             }
 
+            if (!taskGroup.date) {
+                return false;
+            }
+
             if (
                 taskGroup.date.getYear() === date.getYear() &&
                 taskGroup.date.getMonth() === date.getMonth() &&
@@ -63,6 +67,11 @@ const taskTabs = [
                 return false;
             }
 
+            if (!taskGroup.date) {
+                return false;
+            }
+
+
             if (
                 taskGroup.date.getYear() === date.getYear() &&
                 taskGroup.date.getMonth() === date.getMonth() &&
@@ -80,6 +89,10 @@ const taskTabs = [
         groupFilter: (taskGroup) => {
 
             if (taskGroup.completed) {
+                return false;
+            }
+
+            if (!taskGroup.date) {
                 return false;
             }
 
@@ -253,12 +266,17 @@ class List extends Component {
 
     groupTasks = (tasks) => {
         let taskGroups = [
-            { tasks: [], completed: true } // Completed tasks group.
+            { tasks: [], completed: true }, // Completed task group.
+            { tasks: [] } // No date task group.
         ];
 
         tasks.forEach(t => {
             if (t.completed) {
                 return taskGroups[0].tasks.push(t);
+            }
+
+            if (!t.date) {
+                return taskGroups[1].tasks.push(t);
             }
 
             let target = taskGroups.find(g => g.date === t.date);
@@ -284,7 +302,7 @@ class List extends Component {
         let date3 = new Date();
         date3.setDate(date.getDate() + 2);
         let date4 = new Date();
-        date4.setDate(23);
+        date4.setDate(8);
 
         const tasks = [
             { id:'task1', title:'Wyrzucić śmieci.', description:'Elo.', date: date },
@@ -292,6 +310,7 @@ class List extends Component {
             { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limoooooooooooooooooooo.', date: date2 },
             { id:'task3', title:'Pamiętaj o kablu do akumulatora.', date: date3, completed:true },
             { id:'task3', title:'Pobić żonę', date: date4 },
+            { id:'task3', title:'Pobić żonę2' },
         ];
 
         this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });

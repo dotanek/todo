@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const app = express();
 const mongoose = require('mongoose');
@@ -13,7 +12,7 @@ const PORT = process.env.PORT;
 // Import routes
 
 const authRoute = require('./routes/auth');
-const testRoute = require('./routes/test');
+const tasksRoute = require('./routes/tasks');
 
 // Middleware
 
@@ -22,8 +21,7 @@ app.use(express.json());
 // Route middlewares
 
 app.use('/api/user', authRoute);
-app.use('/test', testRoute);
-
+app.use('/api/tasks', tasksRoute);
 
 // Database
 
