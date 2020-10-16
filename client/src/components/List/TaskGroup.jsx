@@ -110,7 +110,7 @@ class TaskGroup extends Component {
             return tasks.map(t => {
                 return (
                     <Task
-                        key={t.id}
+                        key={t._id}
                         task={t}
                         taskActive={this.props.activeTask === t}
                         onClickTask={() => this.props.onClickTask(t)}
@@ -118,7 +118,7 @@ class TaskGroup extends Component {
                 );
             });
         } else {
-            return <Placeholder>There are no tasks for this day.</Placeholder>
+            return <Placeholder>There are no tasks in this group.</Placeholder>
         }
     }
 

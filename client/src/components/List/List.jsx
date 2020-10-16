@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 import Nav from './Nav';
 import Contents from './Contents';
@@ -297,23 +298,33 @@ class List extends Component {
 
         // Grouping tasks by date.
 
-        let date2 = new Date();
-        date2.setDate(date.getDate() + 1);
-        let date3 = new Date();
-        date3.setDate(date.getDate() + 2);
-        let date4 = new Date();
-        date4.setDate(8);
-
-        const tasks = [
+        /*const tasks = [
             { id:'task1', title:'Wyrzucić śmieci.', description:'Elo.', date: date },
             { id:'task2', title:'Zrobić pranie.', description: '', date: date },
             { id:'task3', title:'Pamiętaj aby strzelić bujakę po mieście i dostać limoooooooooooooooooooo.', date: date2 },
             { id:'task3', title:'Pamiętaj o kablu do akumulatora.', date: date3, completed:true },
             { id:'task3', title:'Pobić żonę', date: date4 },
             { id:'task3', title:'Pobić żonę2' },
-        ];
+        ];*/
 
-        this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });
+        let config = {
+            headers: {
+                'auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjc3MWFkNmVlZGRiNjI2MjgwNDA0ZGMiLCJpYXQiOjE2MDI4NTEyODZ9.nN8hjT7KOJ-jKsoad_BoKSMqcF15aAgp6YNktc79wLY'
+            }
+        }
+        
+        axios.get('http://localhost:9000/api/tasks/fetch',config)
+            .then(res => {
+                const tasks = res.data;
+                this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });
+            })
+            .catch(e => {
+                if (e.response) {
+                    console.log(e.response.data);
+                }
+
+                this.setState({ tasks:[], taskGroups:[] });
+            });
     }
 
     render() { 

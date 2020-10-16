@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const app = express();
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const tasksRoute = require('./routes/tasks');
 
 // Middleware
 
+app.use(cors());
 app.use(express.json());
 
 // Route middlewares
