@@ -81,7 +81,7 @@ class Nav extends Component {
     render() {
         return (
             <Container className='noSelect' ref={this.props.navRef} navToggle={this.props.navToggle}>
-                <User>Username</User>
+                <User>{this.props.username}</User>
                 {this.renderTaskTabs()}
             </Container>
         );

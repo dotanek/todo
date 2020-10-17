@@ -8,7 +8,29 @@ const validation = require('./validation');
 
 const User = require('../model/user');
 
+router.get('/', async (req,res) => {
+    const token = req.header('auth-token');
+
+    if (!token) {
+        return res.status(400).send('Access denied.');
+    }
+
+    try {
+        const verified = jwt.verify(token,process.env.TOKEN_SECRET);
+        let user = await User.findOne({ _id:verified._id });
+        if (!user) {
+            return res.status(400).send('User does not exist.')
+        }
+
+        res.send({ username:user.username });
+    } catch (e) {
+        return res.status(400).send(e);
+    }
+});
+
 router.post('/register', async (req,res) => {
+
+    console.log(req.body);
 
     const {error} = validation.registerValidation(req.body); // Validation of username and password.
 

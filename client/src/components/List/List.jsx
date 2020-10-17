@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeConsumer } from 'styled-components';
 import axios from 'axios';
 
 import Nav from './Nav';
@@ -30,6 +30,15 @@ const Button = styled.div`
             cursor: pointer;
         }
     }
+`
+
+const SignOutButton = styled.button`
+    position: fixed;
+    width: 200px;
+    height:80px;
+    top: 100px;
+    right: 500px;
+    z-index: 1000;
 `
 
 let date = new Date();
@@ -149,7 +158,7 @@ class List extends Component {
         detailsToggle: (window.innerWidth >= 700),
         mobileView: (window.innerWidth < 700),
         taskGroups: [],
-        activeTab: taskTabs[0]
+        activeTab: taskTabs[0],
     }
 
     constructor(props) {
@@ -165,7 +174,6 @@ class List extends Component {
     // -- Events --
 
     onResizeWindow = () => {
-
         this.containerRef.current.style.height = window.innerHeight + 'px'; // Keep 100% height on window resize.
 
         if (this.windowWidth === window.innerWidth ) { // Prevent nav and details from hiding on height change. (Necessary for mobile when keyboard changes site height)
@@ -196,11 +204,19 @@ class List extends Component {
     }
 
     onClickWindow = e => {
+        if (!this.navRef.current) {
+            return;
+        }
+
         if(
             (!this.navRef.current.contains(e.target) && !this.buttonRef.current.contains(e.target)) &&
             window.innerWidth < 900
         ) {
             this.setState({ navToggle:false }); // Hides navigation when clicking outside of it in mobile mode.
+        }
+
+        if (!this.detailsRef.current) {
+            return;
         }
 
         if(
@@ -307,13 +323,25 @@ class List extends Component {
             { id:'task3', title:'Pobić żonę2' },
         ];*/
 
+        const token = localStorage.getItem('token');
+
         let config = {
             headers: {
-                'auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjc3MWFkNmVlZGRiNjI2MjgwNDA0ZGMiLCJpYXQiOjE2MDI4NTEyODZ9.nN8hjT7KOJ-jKsoad_BoKSMqcF15aAgp6YNktc79wLY'
+                'auth-token': token
             }
         }
+
+        axios.get('http://localhost:9000/api/user', config)
+            .then(res => {
+                this.setState({ username:res.data.username });
+            })
+            .catch(e => {
+                if (e.response) {
+                    console.log(e.response.data);
+                }
+            });
         
-        axios.get('http://localhost:9000/api/tasks/fetch',config)
+        axios.get('http://localhost:9000/api/tasks/fetch', config)
             .then(res => {
                 const tasks = res.data;
                 this.setState({ tasks:tasks, taskGroups:this.groupTasks(tasks) });
@@ -327,9 +355,20 @@ class List extends Component {
             });
     }
 
+    componentWillUnmount = () => {
+        window.removeEventListener('resize', this.onResizeWindow);
+        window.removeEventListener('click', this.onClickWindow);  
+    }
+
     render() { 
         return (
             <Container ref={this.containerRef}>
+                <SignOutButton
+                    onClick={() => {this.props.auth.signOut(() => {
+                        localStorage.removeItem('token');
+                        this.props.history.push('/');
+                    })}}
+                >SignOut</SignOutButton>
                 <Nav
                     activeTab={this.state.activeTab}
                     taskTabs={taskTabs}
@@ -337,6 +376,7 @@ class List extends Component {
                     navToggle={this.state.navToggle}
                     taskGroups={this.state.taskGroups}
                     onClickTaskTab={(taskTab) => this.onClickTaskTab(taskTab)}
+                    username={this.state.username}
                 />
                 <Contents
                     navToggle={this.state.navToggle}
